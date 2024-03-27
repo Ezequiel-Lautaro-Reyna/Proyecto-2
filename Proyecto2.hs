@@ -99,8 +99,8 @@ Es de tipo algebraico sin parametros
 --Ejercicio 4.c--
 contar_velocistas :: [Deportista] -> Int
 contar_velocistas [] = 0
-contar_velocistas (Velocista _ : xs) = 1 + contar_velocistas xs
-contar_velocistas ( _ : xs) = contar_velocistas xs
+contar_velocistas (Velocista _ : xs) | 1 + contar_velocistas xs
+                                     | otherwise = contar_velocistas xs
 --Ejercicio 4.d--
 contar_futbolistas :: [Deportista] -> Zona -> Int
 contar_futbolistas [] z = 0
