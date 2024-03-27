@@ -84,7 +84,7 @@ Ord en este caso y la forma en la que los elementos estan cargados ayuda a defin
 type Altura = Int
 type NumCamiseta = Int
 -- Tipos algebraicos sin parametros (aka enumerados) --
-data Zona = Arco | Defensa | Mediocampo | Delantera deriving (Eq, Bounded)
+data Zona = Arco | Defensa | Mediocampo | Delantera deriving (Eq, Bounded, Ord)
 data TipoReves = DosManos | UnaMano deriving (Eq, Bounded)
 data Modalidad = Carretera | Pista | Monte | BMX deriving (Eq, Bounded)
 data PiernaHabil = Izquierda | Derecha deriving (Eq, Bounded)
@@ -101,4 +101,8 @@ contar_velocistas :: [Deportista] -> Int
 contar_velocistas [] = 0
 contar_velocistas (Velocista _ : xs) = 1 + contar_velocistas xs
 contar_velocistas ( _ : xs) = contar_velocistas xs
-      
+--Ejercicio 4.d--
+contar_futbolistas :: [Deportista] -> Zona -> Int
+contar_futbolistas [] z = 0
+contar_futbolistas (Futbolista x _ _ _ :xs) z | x == z = 1 + contar_futbolistas xs z 
+                                              | otherwise = contar_futbolistas xs z
