@@ -84,14 +84,15 @@ Ord en este caso y la forma en la que los elementos estan cargados ayuda a defin
 type Altura = Int
 type NumCamiseta = Int
 -- Tipos algebraicos sin parametros (aka enumerados) --
-data Zona = Arco | Defensa | Mediocampo | Delantera deriving (Eq, Bounded, Ord)
-data TipoReves = DosManos | UnaMano deriving (Eq, Bounded)
-data Modalidad = Carretera | Pista | Monte | BMX deriving (Eq, Bounded)
-data PiernaHabil = Izquierda | Derecha deriving (Eq, Bounded)
+data Zona = Arco | Defensa | Mediocampo | Delantera deriving (Eq, Bounded, Ord, Show)
+data TipoReves = DosManos | UnaMano deriving (Eq, Bounded, Show)
+data Modalidad = Carretera | Pista | Monte | BMX deriving (Eq, Bounded, Show)
+data PiernaHabil = Izquierda | Derecha deriving (Eq, Bounded, Show)
 -- Sinonimo --
 type ManoHabil = PiernaHabil 
 --Deportista es un tipo algebraico con constructores parametricos --
-data Deportista = Ajedrecista | Ciclista Modalidad | Velocista Altura | Tenista TipoReves ManoHabil Altura | Futbolista Zona NumCamiseta PiernaHabil Altura  deriving Eq
+data Deportista = Ajedrecista | Ciclista Modalidad | Velocista Altura | Tenista TipoReves ManoHabil Altura | Futbolista Zona NumCamiseta PiernaHabil Altura  
+    deriving (Eq, Show)
 --Ejercicio 4.b--
 {-
 Es de tipo algebraico sin parametros
@@ -102,10 +103,72 @@ contar_velocistas [] = 0
 contar_velocistas (Velocista _ : xs) = 1 + contar_velocistas xs
 contar_velocistas ( _ : xs) = contar_velocistas xs
 --Ejercicio 4.d--
-contarFutbolistas :: [Deportista] -> Int
-contarFutbolistas []  = 0
+contarFutbolistas :: [Deportista] -> Zona -> Int
+contarFutbolistas [] z = 0
 contarFutbolistas ((Futbolista Arco _ _ _):xs) Arco = 1 + contarFutbolistas xs Arco
-contarFutbolistas ((Futbolista Defenza _ _ _):xs) Defenza = 1 + contarFutbolistas xs Defenza
+contarFutbolistas ((Futbolista Defensa _ _ _):xs) Defensa = 1 + contarFutbolistas xs Defensa
 contarFutbolistas ((Futbolista Mediocampo _ _ _):xs) Mediocampo = 1 + contarFutbolistas xs Mediocampo
 contarFutbolistas ((Futbolista Delantera _ _ _):xs) Delantera = 1 + contarFutbolistas xs Delantera
 contarFutbolistas (_:xs) z = contarFutbolistas xs z
+-- 4 e
+estaEnZona:: Zona -> Deportista -> Bool
+estaEnZona Arco (Futbolista Arco _ _ _) = True
+estaEnZona Defensa (Futbolista Defensa _ _ _) = True
+estaEnZona Mediocampo (Futbolista Mediocampo _ _ _) = True
+estaEnZona Delantera (Futbolista Delantera _ _ _) = True
+estaEnZona _ _ = False
+contarFutbolistas':: [Deportista] -> Zona -> Int
+contarFutbolistas' [] z = 0
+contarFutbolistas' xs z = length (filter(estaEnZona z) (xs))
+--Ejercicio 5.a--
+sonidoNatural :: NotaBasica -> Int
+sonidoNatural Do = 0
+sonidoNatural Re = 2
+sonidoNatural Mi = 4
+sonidoNatural Fa = 5
+sonidoNatural Sol = 7
+sonidoNatural La = 9
+sonidoNatural Si = 11
+--Ejercicio 5.b--
+data Alteracion = Bemol | Natural | Sostenido
+--Ejercicio 5.c--
+data NotaMusical = Nota NotaBasica Alteracion
+--Ejercicio 5.d--
+sonidoCromatico :: NotaMusical -> Int
+sonidoCromatico (Nota n Sostenido) = (sonidoNatural n) + 1
+sonidoCromatico (Nota n Bemol)     = (sonidoNatural n) - 1 
+sonidoCromatico (Nota n Natural)   = (sonidoNatural n) + 0
+--Ejercicio 5.e--
+instance Eq NotaMusical where
+    n1 == n2 = sonidoCromatico n1 == sonidoCromatico n2
+--Ejercicio 5.f--
+instance Ord NotaMusical where
+    n1 <= n2 = sonidoCromatico n1 <= sonidoCromatico n2
+--Ejercicio 6.a--
+primerElemento:: [a] -> Maybe a 
+primerElemento [] = Nothing
+primerElemento (x:xs) = Just x
+--Ejercicio 7.a.1--
+data Cola = VaciaC | Encolada Deportista Cola     
+    deriving (Show)
+atender :: Cola -> Maybe Cola
+atender VaciaC = Nothing
+atender (Encolada y x) = Just x
+--Ejercicio 7.a.2--
+encolar :: Deportista -> Cola -> Cola
+encolar z VaciaC = (Encolada z VaciaC)
+encolar z (Encolada y x) = (Encolada y (encolar z x)) 
+--Ejercicio 7.a.3--
+busca :: Cola -> Zona -> Maybe Deportista
+busca VaciaC _ = Nothing
+busca (Encolada (Futbolista Arco x y z) cola) Arco = Just (Futbolista Arco n ph a)
+busca (Encolada (Futbolista Defensa x y z) cola) Defensa = Just (Futbolista Defensa n ph a)
+busca (Encolada (Futbolista Mediocampo x y z) cola) Mediocampo = Just (Futbolista Mediocampo n ph a)
+busca (Encolada (Futbolista Delantera x y z) cola) Delantera = Just (Futbolista Delantera n ph a)
+busca (Encolada dep cola) zona = busca cola zona
+--Ejercicio 7.b--
+{-
+Se parece a Lista
+-}
+--Ejercicio 8.a--
+--Ejercicio 8.b--
